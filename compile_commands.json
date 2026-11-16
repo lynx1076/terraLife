@@ -1,0 +1,21 @@
+[
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/main.c",
+      "-o",
+      ".build/main.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/main.o"
+  }
+]
