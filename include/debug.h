@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ASSERT(BOOL) do { if (!(BOOL)) { printf("Assert failed on line %i of \"%s\": %s\n", __LINE__, __FILE__, #BOOL); exit(-1); } } while (0)
+#define ASSERT(EXPR) do { if (!(EXPR)) { printf("Assert failed on line %i of \"%s\": %s\n", __LINE__, __FILE__, #EXPR); exit(-1); } } while (0)
 #else
-#define ASSERT(BOOL) do {} while(0)
+#define ASSERT(EXPR) do {} while(0)
 #endif
 
 #endif

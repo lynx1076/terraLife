@@ -2,15 +2,15 @@ PROJNAME = terraLife
 VERSION = 0.1
 
 CC = gcc
-CFLAGS = -Wall -Wextra -DVERSION='"$(VERSION)"' -O3 # -g -O0 -DDEBUG
+CFLAGS = -Wall -Wextra -DVERSION='"$(VERSION)"' -O3 -g -O0 -DDEBUG
 CPPFLAGS =
-LDFLAGS = -O3 # -g -O0 #-fsanitize=address,undefined -fno-omit-frame-pointer
+LDFLAGS = -O3 -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer
 LDLIBS = -lm -lpthread -lraylib
-
-BUILD_DIR = .build
 
 SRC_DIRS = src
 INCLUDE_DIRS = include
+
+BUILD_DIR = .build
 
 EXE = $(BUILD_DIR)/$(PROJNAME)
 
@@ -23,6 +23,7 @@ DEPS = $(OBJS:.o=.d)
 all: $(EXE)
 
 run: $(EXE)
+	cp -r shader $(BUILD_DIR)
 	./$(EXE)
 
 $(EXE): $(OBJS) | $(BUILD_DIR)
