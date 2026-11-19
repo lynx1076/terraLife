@@ -4,14 +4,18 @@
 #include <raylib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-int pix_ArenaInit(PixelArena* pxa, size_t tx, size_t ty) {
+int pix_PixelArenaInit(PixelArena* pxa, PixelCoords pos) {
   ASSERT(pxa);
 
-  pxa->tx = tx;
-  pxa->ty = ty;
+  PixelArenaData* data = malloc(sizeof(PixelArenaData));
+  if (data == NULL) RES_RETURN(r_EMEM, -1);
 
-  if (pix_ArenaFill(pxa, 0)) return -1;
+  pxa->data = data;
+  pxa->pos = pix_GlobalToArenaCoords(pos);
+
+  if (pix_PixelArenaFill(pxa, 0)) return -1;
 
   Image img = {
     .format = PIXELFORMAT_UNCOMPRESSED_GRAYSCALE,
@@ -21,54 +25,53 @@ int pix_ArenaInit(PixelArena* pxa, size_t tx, size_t ty) {
     .data = pxa->data->pixels,
   };
 
-  pxa->tex = LoadTextureFromImage(img);
-  SetTextureFilter(pxa->tex, TEXTURE_FILTER_POINT);
+  pxa->data->tex = LoadTextureFromImage(img);
+  SetTextureFilter(pxa->data->tex, TEXTURE_FILTER_POINT);
 
   RES_RETURN(r_ENONE, 0);
 }
 
-void pix_ArenaFree(PixelArena* pxa) {
+void pix_PixelArenaFree(PixelArena* pxa) {
   ASSERT(pxa);
 
-  UnloadTexture(pxa->tex);
+  UnloadTexture(pxa->data->tex);
+  free(pxa->data);
 }
 
-int pix_ArenaFill(PixelArena* pxa, uint8_t fill) {
+int pix_PixelArenaFill(PixelArena* pxa, PixelState fill) {
   ASSERT(pxa);
 
   for (size_t y = 0; y < PIXEL_ARENA_SIZE; y++) {
     for (size_t x = 0; x < PIXEL_ARENA_SIZE; x++) {
-      pxa->pixels[y][x] = fill;
+      if (pix_PixelArenaSetPix(pxa, x, y, fill)) return -1;
     }
   }
 
   RES_RETURN(r_ENONE, 0);
 }
 
-int pix_ArenaDraw(PixelArena* pxa) {
+int pix_PixelArenaDraw(PixelArena* pxa) {
   ASSERT(pxa);
 
-  UpdateTexture(pxa->tex, pxa->pixels);
-  Vector2 pos = {pxa->tx * PIXEL_SCALE, pxa->ty * PIXEL_SCALE};
-  DrawTextureEx(pxa->tex, pos, 0, PIXEL_SCALE, WHITE);
+  UpdateTexture(pxa->data->tex, pxa->data->pixels);
+  Vector2 pos = {pxa->pos.x * PIXEL_SCALE, pxa->pos.y * PIXEL_SCALE};
+  DrawTextureEx(pxa->data->tex, pos, 0, PIXEL_SCALE, WHITE);
 
   RES_RETURN(r_ENONE, 0);
 }
 
-int pix_ArenaSetPix(PixelArena* pxa, unsigned int x, unsigned int y, bool state) {
+int pix_PixelArenaSetPix(PixelArena* pxa, unsigned int x, unsigned int y, PixelState state) {
   ASSERT(pxa);
 
-  uint8_t* pixel = &pxa->pixels[y][x];
-  *pixel = (*pixel >> 1) | ((state ? 1 : 0) << 7);
+  pxa->data->pixels[y][x] = state;
 
   RES_RETURN(r_ENONE, 0);
 }
 
-int pix_ArenaUpdate(PixelArena* pxa) {
-  ASSERT(pxa);
-
-
-
-  RES_RETURN(r_ENONE, 0);
+PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {
+  return (PixelCoords){
+    .x = pos.x - pos.x % PIXEL_ARENA_SIZE,
+    .y = pos.y - pos.y % PIXEL_ARENA_SIZE,
+  };
 }
 

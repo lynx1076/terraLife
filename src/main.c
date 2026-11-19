@@ -1,5 +1,6 @@
 #include "pixel.h"
 #include "result.h"
+#include "world.h"
 #include <raylib.h>
 #include <rlgl.h>
 #include <stddef.h>
@@ -31,17 +32,17 @@ int main(int argc, const char** argv) {
   int loc_colors = GetShaderLocation(shader_arena, "colors");
 
   uint32_t states[4] = {
-    0b10000001,
-    0b10000000,
-    0b01000000,
-    0b00000001,
+    PIXEL_BORN,
+    PIXEL_ALIVE,
+    PIXEL_DIED,
+    PIXEL_DEAD,
   };
 
   Vector4 colors[4] = {
-    { 0.22f, 0.8f, 1.0f, 1.0f }, // State 3: Mature
-    { 0.22f, 0.05f, 1.0f, 1.0f }, // State 2: Born
-    { 0.90f, 0.25f, 0.35f, 1.0f }, // State 1: Died
-    { 0.08f, 0.09f, 0.12f, 1.0f }, // State 0: Dead
+    { 0.22f, 0.05f, 1.0f, 1.0f },   // Born
+    { 0.22f, 0.8f, 1.0f, 1.0f },    // Alive
+    { 0.27f, 0.27f, 0.3f, 1.0f },   // Died
+    { 0.08f, 0.09f, 0.12f, 1.0f },  // Dead
   };
   
   SetShaderValueV(shader_arena, loc_states, states, SHADER_UNIFORM_UINT, 4);
@@ -53,19 +54,15 @@ int main(int argc, const char** argv) {
   camera.rotation = 0.0f;
   camera.zoom = 1.0f;
 
-  PixelArena pxa;
-  if (pix_ArenaInit(&pxa, 0, 0)) return _res;
-  if (pix_ArenaSetPix(&pxa, 0, 0, true)) return _res;
-  if (pix_ArenaSetPix(&pxa, 20, 0, true)) return _res;
-  if (pix_ArenaSetPix(&pxa, 20, 20, true)) return _res;
-  if (pix_ArenaSetPix(&pxa, 20, 20, true)) return _res;
+  World world;
+  if (wod_Init(&world)) return _res;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(WHITE);
 
     BeginShaderMode(shader_arena);
-    if (pix_ArenaDraw(&pxa)) return _res;
+    if (wod_Draw(&world)) return _res;
     EndShaderMode();
 
     EndDrawing();
