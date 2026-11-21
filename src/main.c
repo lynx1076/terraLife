@@ -31,22 +31,20 @@ int main(int argc, const char** argv) {
   int loc_states = GetShaderLocation(shader_arena, "states");
   int loc_colors = GetShaderLocation(shader_arena, "colors");
 
-  uint32_t states[4] = {
-    PIXEL_BORN,
-    PIXEL_ALIVE,
-    PIXEL_DIED,
-    PIXEL_DEAD,
+  int32_t states[3] = {
+    pix_Born,
+    pix_Alive,
+    pix_Died,
   };
 
-  Vector4 colors[4] = {
+  Vector4 colors[3] = {
     { 0.22f, 0.05f, 1.0f, 1.0f },   // Born
     { 0.22f, 0.8f, 1.0f, 1.0f },    // Alive
     { 0.27f, 0.27f, 0.3f, 1.0f },   // Died
-    { 0.08f, 0.09f, 0.12f, 1.0f },  // Dead
   };
   
-  SetShaderValueV(shader_arena, loc_states, states, SHADER_UNIFORM_UINT, 4);
-  SetShaderValueV(shader_arena, loc_colors, colors, SHADER_UNIFORM_VEC4, 4);
+  SetShaderValueV(shader_arena, loc_states, states, SHADER_UNIFORM_INT, 3);
+  SetShaderValueV(shader_arena, loc_colors, colors, SHADER_UNIFORM_VEC4, 3);
  
   camera = (Camera2D){ 0 };
   camera.target = (Vector2){0, 0};
@@ -57,9 +55,23 @@ int main(int argc, const char** argv) {
   World world;
   if (wod_Init(&world)) return _res;
 
+  if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE, PIXEL_ARENA_SIZE})) return _res;
+  if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE*3, PIXEL_ARENA_SIZE*2})) return _res;
+  if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE*1, PIXEL_ARENA_SIZE*2})) return _res;
+  if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE*5, PIXEL_ARENA_SIZE*3})) return _res;
+
+  if (wod_SetPixel(&world, (PixelCoords){0, 0}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){10, 10}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){12, 11}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){11, 11}, pix_Born)) return _res;
+
   while (!WindowShouldClose()) {
     BeginDrawing();
-    ClearBackground(WHITE);
+    ClearBackground((Color){20, 23, 31, 0xFF});
+
+    if (IsKeyPressed(KEY_SPACE)) {
+      wod_StepWorld(&world);
+    }
 
     BeginShaderMode(shader_arena);
     if (wod_Draw(&world)) return _res;
