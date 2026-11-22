@@ -57,6 +57,8 @@ int wod_AddArena(World* world, PixelCoords pos) {
     if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
       RES_RETURN(r_ENONE, 0);
     }
+
+    if (high == low) break;
     
     if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
       low = mid + 1;
@@ -92,7 +94,7 @@ Arena* wod_GetArena(World* world, PixelCoords pos) {
     if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
       RES_RETURN(r_ENONE, arena);
     }
-    
+
     if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
       low = mid + 1;
     } else {
@@ -166,7 +168,8 @@ int wod_CountNeighbours(World* world, PixelCoords pos, int* n) {
 int wod_AllocateArenas(World* world) {
   ASSERT(world);
 
-  PixelCoords new_arenas[8];
+  Vec new_arenas;
+  if (vec_init(&new_arenas, sizeof(PixelCoords))) return -1;
 
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
@@ -186,12 +189,22 @@ int wod_AllocateArenas(World* world) {
         if (pix <= 0) continue;
 
         PixelCoords new_arena_pos = (PixelCoords){
-          arena->pos.x == 0 ? arena->pos.x - 1 : arena->pos.x == PIXEL_ARENA_SIZE - 1 ? arena->pos.x + 1 : arena->pos.x, 
-          arena->pos.y == 0 ? arena->pos.y - 1 : arena->pos.y == PIXEL_ARENA_SIZE - 1 ? arena->pos.y + 1 : arena->pos.y
+          pos.x == 0 ? arena->pos.x - 1 : pos.x == PIXEL_ARENA_SIZE - 1 ? arena->pos.x + 1 : arena->pos.x, 
+          pos.y == 0 ? arena->pos.y - 1 : pos.y == PIXEL_ARENA_SIZE - 1 ? arena->pos.y + 1 : arena->pos.y
         };
+
+        if (vec_push(&new_arenas, &new_arena_pos)) return -1;
       }
     }
   }
+
+  for (size_t i = 0; i < new_arenas.count; i++) {
+    PixelCoords* pos = vec_get(&new_arenas, i);
+    printf("Alloc %zi, %zi\n", pos->x, pos->y);
+    if (wod_AddArena(world, *pos)) return -1;
+  }
+
+  vec_free(&new_arenas);
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -199,6 +212,9 @@ int wod_AllocateArenas(World* world) {
 int wod_StepWorld(World* world) {
   ASSERT(world);
 
+  printf("Alloc\n");
+  if (wod_AllocateArenas(world)) return -1;
+  printf("Alloc okay\n");
 
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
