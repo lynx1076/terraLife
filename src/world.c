@@ -117,6 +117,17 @@ int wod_Draw(World* world) {
   RES_RETURN(r_ENONE, 0);
 }
 
+int wod_Flip(World* world) {
+  ASSERT(world);
+
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
+    pix_ArenaSwitchBuff(arena);
+  }
+
+  RES_RETURN(r_ENONE, 0);
+}
+
 int wod_CountNeighbours(World* world, PixelCoords pos, int* n) {
   ASSERT(world);
 
@@ -186,17 +197,14 @@ int wod_AllocateArenas(World* world) {
 int wod_StepWorld(World* world) {
   ASSERT(world);
 
-  for (size_t i = 0; i < world->arenas.count; i++) {
-    Arena* arena = vec_get(&world->arenas, i);
-    pix_ArenaSwitchBuff(arena);
-  }
-  
   if (wod_AllocateArenas(world)) return -1;
 
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
     if (wod_StepArena(world, arena)) return -1;
   }
+
+  if (wod_Flip(world)) return -1;
 
   RES_RETURN(r_ENONE, 0);
 }

@@ -14,9 +14,11 @@ int pix_ArenaInit(Arena* pxa, PixelCoords pos) {
   if (data == NULL) RES_RETURN(r_EMEM, -1);
 
   pxa->data = data;
-  pxa->data->write_buff_a = true;
+  pxa->data->write_buff_a = false;
   pxa->pos = pix_GlobalToArenaCoords(pos);
 
+  if (pix_ArenaFill(pxa, pix_Dead)) return -1;
+  pix_ArenaSwitchBuff(pxa);
   if (pix_ArenaFill(pxa, pix_Dead)) return -1;
 
   Image img = {
@@ -30,8 +32,6 @@ int pix_ArenaInit(Arena* pxa, PixelCoords pos) {
   pxa->data->tex = LoadTextureFromImage(img);
   SetTextureFilter(pxa->data->tex, TEXTURE_FILTER_POINT);
   
-  pix_ArenaSwitchBuff(pxa);
-
   RES_RETURN(r_ENONE, 0);
 }
 
@@ -57,14 +57,11 @@ int pix_ArenaFill(Arena* pxa, PixelState fill) {
 int pix_ArenaDraw(Arena* pxa) {
   ASSERT(pxa);
 
-  if (pxa->data->write_buff_a) UpdateTexture(pxa->data->tex, pxa->data->pixels_a);
+  if (!pxa->data->write_buff_a) UpdateTexture(pxa->data->tex, pxa->data->pixels_a);
   else UpdateTexture(pxa->data->tex, pxa->data->pixels_b);
 
   Vector2 pos = {pxa->pos.x * PIXEL_SCALE, pxa->pos.y * PIXEL_SCALE};
   DrawTextureEx(pxa->data->tex, pos, 0, PIXEL_SCALE, WHITE);
-
-  if (pxa->data->write_buff_a) memcpy(pxa->data->pixels_b, pxa->data->pixels_a, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
-  else memcpy(pxa->data->pixels_a, pxa->data->pixels_b, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
 
   RES_RETURN(r_ENONE, 0);
 }
