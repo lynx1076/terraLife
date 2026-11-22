@@ -16,14 +16,14 @@ int wod_Init(World* world) {
   if (pix_ArenaInit(&pix, (PixelCoords){0, 0})) return -1;
   if (vec_push(&world->arenas, &pix)) return -1;
  
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 9; i++) {
     world->n_surv[i] = false;
     world->n_birth[i] = false;
   }
 
-  world->n_surv[1] = true;
   world->n_surv[2] = true;
-  world->n_birth[2] = true;
+  world->n_surv[3] = true;
+  world->n_birth[3] = true;
 
   world->iterations = 0;
 
@@ -47,36 +47,32 @@ int wod_AddArena(World* world, PixelCoords pos) {
 
   PixelCoords arena_pos = pix_GlobalToArenaCoords(pos);
   
-  size_t a = 0;
-  size_t b = world->arenas.count;
+  size_t low = 0;
+  size_t high = world->arenas.count - 1;
 
-  size_t i = (a + b) / 2;
+  size_t mid = low + (high - low) / 2;
 
-  Arena* arena = vec_get(&world->arenas, i);
-  while (arena) {
+  Arena* arena = vec_get(&world->arenas, mid);
+  while (low <= high && arena) {
     if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
       RES_RETURN(r_ENONE, 0);
     }
     
     if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
-      b = i;
+      low = mid + 1;
     } else {
-      a = i;
+      high = mid - 1;
     }
+    
+    mid = low + (high - low) / 2;
  
-    if (a == b - 1) {
-      if (i == b) break;
-      i = b;
-    }
-    else i = (a + b) / 2;
-
-    arena = vec_get(&world->arenas, i);
+    arena = vec_get(&world->arenas, mid);
   }
 
   Arena pxa;
   if (pix_ArenaInit(&pxa, pos)) return -1;
 
-  if (vec_push_to(&world->arenas, i, &pxa)) return -1;
+  if (vec_push_to(&world->arenas, mid, &pxa)) return -1;
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -86,33 +82,29 @@ Arena* wod_GetArena(World* world, PixelCoords pos) {
 
   PixelCoords arena_pos = pix_GlobalToArenaCoords(pos);
   
-  size_t a = 0;
-  size_t b = world->arenas.count;
+  size_t low = 0;
+  size_t high = world->arenas.count - 1;
 
-  size_t i = (a + b) / 2;
+  size_t mid = low + (high - low) / 2;
 
-  Arena* arena = vec_get(&world->arenas, i);
-  while (arena) {
+  Arena* arena = vec_get(&world->arenas, mid);
+  while (low <= high && arena) {
     if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
-      return arena;
+      RES_RETURN(r_ENONE, arena);
     }
     
     if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
-      b = i;
+      low = mid + 1;
     } else {
-      a = i;
+      high = mid - 1;
     }
- 
-    if (a == b - 1) {
-      if (i == b) return NULL;
-      i = b;
-    }
-    else i = (a + b) / 2;
 
-    arena = vec_get(&world->arenas, i);
+    mid = low + (high - low) / 2;
+ 
+    arena = vec_get(&world->arenas, mid);
   }
 
-  return NULL;
+  RES_RETURN(r_ENONE, NULL);
 }
 
 PixelState wod_GetPixel(World* world, PixelCoords pos) {
@@ -200,7 +192,7 @@ int wod_StepArena(World* world, Arena* arena) {
 
       PixelState new_state = pix;
 
-      if (world->n_birth[n]) new_state = pix_Born;
+      if (world->n_birth[n] && pix <= 0) new_state = pix_Born;
       else if (!world->n_surv[n] && pix > 0) new_state = pix_Died;
 
       if (new_state < 0 && pix < 0) new_state = pix_Dead;

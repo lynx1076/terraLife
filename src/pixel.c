@@ -97,8 +97,8 @@ void pix_ArenaSwitchBuff(Arena* pxa) {
 
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {
   return (PixelCoords){
-    .x = pos.x - pos.x % PIXEL_ARENA_SIZE,
-    .y = pos.y - pos.y % PIXEL_ARENA_SIZE,
+    (pos.x >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
+    (pos.y >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
   };
 }
 
