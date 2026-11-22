@@ -161,7 +161,7 @@ int wod_CountNeighbours(World* world, PixelCoords pos, int* n) {
       };
       if (y == 1 && x == 1) continue;
       PixelState pix = wod_GetPixel(world, check_pos);
-      if (pix <= 0) count++;
+      if (pix > 0) count++;
     }
   }
 
@@ -177,11 +177,6 @@ int wod_StepWorld(World* world) {
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
     if (wod_StepArena(world, arena)) return -1;
-  }
-
-  for (size_t i = 0; i < world->arenas.count; i++) {
-    Arena* pxa = vec_get(&world->arenas, i);
-    pix_ArenaSwitchBuff(pxa);
   }
 
   RES_RETURN(r_ENONE, 0);
@@ -202,15 +197,14 @@ int wod_StepArena(World* world, Arena* arena) {
 
       int n;
       if (wod_CountNeighbours(world, pos, &n)) return -1;
-      if (n || pix > 0) printf("Pixel (%zu, %zu) has %i neighbours\n", pos.x, pos.y, n);
 
       PixelState new_state = pix;
 
       if (world->n_birth[n]) new_state = pix_Born;
-      else if (!world->n_surv[n]) new_state = pix_Died;
+      else if (!world->n_surv[n] && pix > 0) new_state = pix_Died;
 
       if (new_state < 0 && pix < 0) new_state = pix_Dead;
-      if (new_state > 0 && pix > 0) new_state = pix_Alive;
+      else if (new_state > 0 && pix > 0) new_state = pix_Alive;
 
       if (wod_SetPixel(world, pos, new_state)) return -1;
     }

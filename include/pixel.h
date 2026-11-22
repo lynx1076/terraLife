@@ -22,8 +22,8 @@ typedef struct {
 } PixelCoords;
 
 typedef struct {
-  uint8_t pixels_a[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];
-  uint8_t pixels_b[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];
+  int8_t pixels_a[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];
+  int8_t pixels_b[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];
   Texture2D tex;
   bool write_buff_a;
 } ArenaData;

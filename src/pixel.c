@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 int pix_ArenaInit(Arena* pxa, PixelCoords pos) {
   ASSERT(pxa);
@@ -17,7 +18,6 @@ int pix_ArenaInit(Arena* pxa, PixelCoords pos) {
   pxa->pos = pix_GlobalToArenaCoords(pos);
 
   if (pix_ArenaFill(pxa, pix_Dead)) return -1;
-  pix_ArenaSwitchBuff(pxa);
 
   Image img = {
     .format = PIXELFORMAT_UNCOMPRESSED_GRAYSCALE,
@@ -60,6 +60,11 @@ int pix_ArenaDraw(Arena* pxa) {
 
   Vector2 pos = {pxa->pos.x * PIXEL_SCALE, pxa->pos.y * PIXEL_SCALE};
   DrawTextureEx(pxa->data->tex, pos, 0, PIXEL_SCALE, WHITE);
+
+  if (pxa->data->write_buff_a) memcpy(pxa->data->pixels_b, pxa->data->pixels_a, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
+  else memcpy(pxa->data->pixels_a, pxa->data->pixels_b, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
+
+  pix_ArenaSwitchBuff(pxa);
 
   RES_RETURN(r_ENONE, 0);
 }

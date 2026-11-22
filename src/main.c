@@ -60,10 +60,11 @@ int main(int argc, const char** argv) {
   if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE*1, PIXEL_ARENA_SIZE*2})) return _res;
   if (wod_AddArena(&world, (PixelCoords){PIXEL_ARENA_SIZE*5, PIXEL_ARENA_SIZE*3})) return _res;
 
-  if (wod_SetPixel(&world, (PixelCoords){0, 0}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){10, 10}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){12, 11}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){11, 11}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){0, 3}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){1, 3}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){1, 1}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){2, 3}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){2, 2}, pix_Born)) return _res;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
