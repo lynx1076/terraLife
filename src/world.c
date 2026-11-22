@@ -163,8 +163,42 @@ int wod_CountNeighbours(World* world, PixelCoords pos, int* n) {
   RES_RETURN(r_ENONE, 0);
 }
 
+int wod_AllocateArenas(World* world) {
+  ASSERT(world);
+
+  PixelCoords new_arenas[8];
+
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
+
+    for (size_t y = 0; y < PIXEL_ARENA_SIZE; y++) {
+      for (size_t x = 0; x < PIXEL_ARENA_SIZE; x++) {
+        PixelCoords pos = {
+          x, 
+          y,
+        };
+
+        if ((x != 0 && x != PIXEL_ARENA_SIZE - 1) && y != 0 && y != PIXEL_ARENA_SIZE - 1) {
+          continue;
+        }
+
+        PixelState pix = pix_ArenaGetPix(arena, pos);
+        if (pix <= 0) continue;
+
+        PixelCoords new_arena_pos = (PixelCoords){
+          arena->pos.x == 0 ? arena->pos.x - 1 : arena->pos.x == PIXEL_ARENA_SIZE - 1 ? arena->pos.x + 1 : arena->pos.x, 
+          arena->pos.y == 0 ? arena->pos.y - 1 : arena->pos.y == PIXEL_ARENA_SIZE - 1 ? arena->pos.y + 1 : arena->pos.y
+        };
+      }
+    }
+  }
+
+  RES_RETURN(r_ENONE, 0);
+}
+
 int wod_StepWorld(World* world) {
   ASSERT(world);
+
 
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
@@ -199,6 +233,10 @@ int wod_StepArena(World* world, Arena* arena) {
       else if (new_state > 0 && pix > 0) new_state = pix_Alive;
 
       if (wod_SetPixel(world, pos, new_state)) return -1;
+
+      if (pix > 0 && ((x == 0 || x == PIXEL_ARENA_SIZE - 1) || (y == 0 || y == PIXEL_ARENA_SIZE - 1))) {
+        
+      }
     }
   }
 

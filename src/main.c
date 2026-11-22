@@ -38,8 +38,8 @@ int main(int argc, const char** argv) {
   };
 
   Vector4 colors[3] = {
-    { 0.22f, 0.05f, 1.0f, 1.0f },   // Born
-    { 0.22f, 0.8f, 1.0f, 1.0f },    // Alive
+    { 0.22f, 0.8f, 1.0f, 1.0f },    // Born
+    { 0.22f, 0.05f, 1.0f, 1.0f },   // Alive
     { 0.27f, 0.27f, 0.3f, 1.0f },   // Died
   };
   
