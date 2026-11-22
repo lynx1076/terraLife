@@ -5,6 +5,7 @@
 #include "vector.h"
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 
 int wod_Init(World* world) {
@@ -25,7 +26,7 @@ int wod_Init(World* world) {
   world->n_surv[3] = true;
   world->n_birth[3] = true;
 
-  world->iterations = 0;
+  world->iteration = 0;
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -42,39 +43,28 @@ void wod_Free(World* world) {
   vec_free(&world->arenas);
 }
 
+void wod_Print(World* world) {
+  if (!world) {
+    printf("World is NULL\n");
+  }
+
+  printf("World:\n");
+  printf("Iteration: %zu\n", world->iteration);
+  printf("Arenas: %zu\n", world->arenas.count);
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
+    printf("[%zu]: %zi, %zi\n", i, arena->pos.x, arena->pos.y);
+  }
+}
+
 int wod_AddArena(World* world, PixelCoords pos) {
   ASSERT(world);
 
-  PixelCoords arena_pos = pix_GlobalToArenaCoords(pos);
-  
-  size_t low = 0;
-  size_t high = world->arenas.count - 1;
+  if (wod_GetArena(world, pos)) RES_RETURN(r_ENONE, 0);
 
-  size_t mid = low + (high - low) / 2;
-
-  Arena* arena = vec_get(&world->arenas, mid);
-  while (low <= high && arena) {
-    if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
-      RES_RETURN(r_ENONE, 0);
-    }
-
-    if (high == low) break;
-    
-    if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-    
-    mid = low + (high - low) / 2;
- 
-    arena = vec_get(&world->arenas, mid);
-  }
-
-  Arena pxa;
-  if (pix_ArenaInit(&pxa, pos)) return -1;
-
-  if (vec_push_to(&world->arenas, mid, &pxa)) return -1;
+  Arena arena;
+  if (pix_ArenaInit(&arena, pos)) return -1;
+  if (vec_push(&world->arenas, &arena)) return -1;
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -84,26 +74,11 @@ Arena* wod_GetArena(World* world, PixelCoords pos) {
 
   PixelCoords arena_pos = pix_GlobalToArenaCoords(pos);
   
-  size_t low = 0;
-  size_t high = world->arenas.count - 1;
-
-  size_t mid = low + (high - low) / 2;
-
-  Arena* arena = vec_get(&world->arenas, mid);
-  while (low <= high && arena) {
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
     if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
       RES_RETURN(r_ENONE, arena);
     }
-
-    if (arena->pos.x > arena_pos.x || (arena->pos.y > arena_pos.y && arena->pos.x == arena_pos.x)) {
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-
-    mid = low + (high - low) / 2;
- 
-    arena = vec_get(&world->arenas, mid);
   }
 
   RES_RETURN(r_ENONE, NULL);
@@ -189,8 +164,8 @@ int wod_AllocateArenas(World* world) {
         if (pix <= 0) continue;
 
         PixelCoords new_arena_pos = (PixelCoords){
-          pos.x == 0 ? arena->pos.x - 1 : pos.x == PIXEL_ARENA_SIZE - 1 ? arena->pos.x + 1 : arena->pos.x, 
-          pos.y == 0 ? arena->pos.y - 1 : pos.y == PIXEL_ARENA_SIZE - 1 ? arena->pos.y + 1 : arena->pos.y
+          pos.x == 0 ? arena->pos.x - 1 : pos.x == PIXEL_ARENA_SIZE - 1 ? arena->pos.x + PIXEL_ARENA_SIZE : arena->pos.x, 
+          pos.y == 0 ? arena->pos.y - 1 : pos.y == PIXEL_ARENA_SIZE - 1 ? arena->pos.y + PIXEL_ARENA_SIZE : arena->pos.y
         };
 
         if (vec_push(&new_arenas, &new_arena_pos)) return -1;
@@ -200,7 +175,6 @@ int wod_AllocateArenas(World* world) {
 
   for (size_t i = 0; i < new_arenas.count; i++) {
     PixelCoords* pos = vec_get(&new_arenas, i);
-    printf("Alloc %zi, %zi\n", pos->x, pos->y);
     if (wod_AddArena(world, *pos)) return -1;
   }
 
@@ -212,9 +186,12 @@ int wod_AllocateArenas(World* world) {
 int wod_StepWorld(World* world) {
   ASSERT(world);
 
-  printf("Alloc\n");
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
+    pix_ArenaSwitchBuff(arena);
+  }
+  
   if (wod_AllocateArenas(world)) return -1;
-  printf("Alloc okay\n");
 
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
@@ -231,11 +208,16 @@ int wod_StepArena(World* world, Arena* arena) {
   for (size_t y = 0; y < PIXEL_ARENA_SIZE; y++) {
     for (size_t x = 0; x < PIXEL_ARENA_SIZE; x++) {
       PixelCoords pos = {
-        x, 
-        y,
+        arena->pos.x + x, 
+        arena->pos.y + y, 
       };
 
-      PixelState pix = pix_ArenaGetPix(arena, pos);
+      PixelCoords arena_pos = {
+        x, 
+        y, 
+      };
+
+      PixelState pix = pix_ArenaGetPix(arena, arena_pos);
 
       int n;
       if (wod_CountNeighbours(world, pos, &n)) return -1;
@@ -248,11 +230,7 @@ int wod_StepArena(World* world, Arena* arena) {
       if (new_state < 0 && pix < 0) new_state = pix_Dead;
       else if (new_state > 0 && pix > 0) new_state = pix_Alive;
 
-      if (wod_SetPixel(world, pos, new_state)) return -1;
-
-      if (pix > 0 && ((x == 0 || x == PIXEL_ARENA_SIZE - 1) || (y == 0 || y == PIXEL_ARENA_SIZE - 1))) {
-        
-      }
+      pix_ArenaSetPix(arena, arena_pos, new_state);
     }
   }
 

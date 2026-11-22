@@ -29,6 +29,8 @@ int pix_ArenaInit(Arena* pxa, PixelCoords pos) {
 
   pxa->data->tex = LoadTextureFromImage(img);
   SetTextureFilter(pxa->data->tex, TEXTURE_FILTER_POINT);
+  
+  pix_ArenaSwitchBuff(pxa);
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -63,8 +65,6 @@ int pix_ArenaDraw(Arena* pxa) {
 
   if (pxa->data->write_buff_a) memcpy(pxa->data->pixels_b, pxa->data->pixels_a, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
   else memcpy(pxa->data->pixels_a, pxa->data->pixels_b, PIXEL_ARENA_SIZE * PIXEL_ARENA_SIZE * sizeof(uint8_t));
-
-  pix_ArenaSwitchBuff(pxa);
 
   RES_RETURN(r_ENONE, 0);
 }

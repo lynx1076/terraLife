@@ -9,7 +9,7 @@
 
 typedef struct {
   Vec arenas;
-  size_t iterations;
+  size_t iteration;
 
   bool n_surv[9];
   bool n_birth[9];
@@ -18,6 +18,7 @@ typedef struct {
 
 int wod_Init(World* world);
 void wod_Free(World* world);
+void wod_Print(World* world);
 int wod_AddArena(World* world, PixelCoords pos);
 Arena* wod_GetArena(World* world, PixelCoords pos);
 PixelState wod_GetPixel(World* world, PixelCoords pos);
