@@ -49,10 +49,6 @@ int main(int argc, const char** argv) {
     BeginDrawing();
     ClearBackground(color_bg);
 
-    if (IsKeyPressed(KEY_SPACE)) {
-      wod_StepWorld(&world);
-    }
-
     if (gui_Draw(&gui, &world)) return -1;
 
     EndDrawing();

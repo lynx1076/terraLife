@@ -2,9 +2,9 @@ PROJNAME = terraLife
 VERSION = 0.1
 
 CC = gcc
-CFLAGS = -Wall -Wextra -DVERSION='"$(VERSION)"' -O3 #-g -O0 -DDEBUG
+CFLAGS = -Wall -Wextra -DVERSION='"$(VERSION)"' -O3 -g -O0 -DDEBUG
 CPPFLAGS =
-LDFLAGS = -O3 #-g -O0 #-fsanitize=address,undefined -fno-omit-frame-pointer
+LDFLAGS = -O3 -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer
 LDLIBS = -lm -lpthread -lraylib
 
 SRC_DIRS = src

@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 
 int wod_Init(World* world) {
@@ -57,11 +58,28 @@ void wod_Print(World* world) {
 int wod_AddArena(World* world, PixelCoords pos) {
   ASSERT(world);
 
-  if (wod_GetArena(world, pos)) RES_RETURN(r_ENONE, 0);
+  size_t low = 0;
+  size_t high = world->arenas.count;
+  size_t mid ;
+
+  size_t goal = pix_ArenaCoordsToSqSpiral(pos);
+
+  while (low <= high) {
+    mid = low + (high - low) / 2;
+
+    Arena* arena = vec_get(&world->arenas, mid);
+    if (!arena) break;
+    size_t curr = pix_ArenaCoordsToSqSpiral(arena->pos);
+    if (curr == goal) {
+      RES_RETURN(r_ENONE, 0);
+    }
+    if (curr < goal) low = mid + 1;
+    else high = mid - 1;
+  }
 
   Arena arena;
   if (pix_ArenaInit(&arena, pos)) return -1;
-  if (vec_push(&world->arenas, &arena)) return -1;
+  if (vec_push_to(&world->arenas, low, &arena)) return -1;
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -69,13 +87,23 @@ int wod_AddArena(World* world, PixelCoords pos) {
 Arena* wod_GetArena(World* world, PixelCoords pos) {
   ASSERT(world);
 
-  PixelCoords arena_pos = pix_GlobalToArenaCoords(pos);
-  
-  for (size_t i = 0; i < world->arenas.count; i++) {
-    Arena* arena = vec_get(&world->arenas, i);
-    if (arena->pos.x == arena_pos.x && arena->pos.y == arena_pos.y) {
+  size_t low = 0;
+  size_t high = world->arenas.count;
+  size_t mid ;
+
+  size_t goal = pix_ArenaCoordsToSqSpiral(pos);
+
+  while (low <= high) {
+    mid = low + (high - low) / 2;
+
+    Arena* arena = vec_get(&world->arenas, mid);
+    if (!arena) RES_RETURN(r_ENONE, NULL);
+    size_t curr = pix_ArenaCoordsToSqSpiral(arena->pos);
+    if (curr == goal) {
       RES_RETURN(r_ENONE, arena);
     }
+    if (curr < goal) low = mid + 1;
+    else high = mid - 1;
   }
 
   RES_RETURN(r_ENONE, NULL);

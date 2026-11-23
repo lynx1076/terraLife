@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,5 +104,21 @@ PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {
     (pos.x >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
     (pos.y >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
   };
+}
+
+size_t pix_ArenaCoordsToSqSpiral(PixelCoords pos) {
+  pos = pix_GlobalToArenaCoords(pos);
+
+  ssize_t x = pos.x;
+  if (x >= 0) x = 2 * x;
+  else x = -2 * x - 1;
+
+  ssize_t y = pos.y;
+  if (y >= 0) y = 2 * y;
+  else y = -2 * y - 1;
+
+  ssize_t res = (x + y) * (x + y + 1) / 2 + y;
+
+  return (size_t)res;
 }
 

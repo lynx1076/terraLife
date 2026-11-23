@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#define PIXEL_ARENA_SIZE_POW2     8
+#define PIXEL_ARENA_SIZE_POW2     2
 #define PIXEL_ARENA_SIZE          (1 << (PIXEL_ARENA_SIZE_POW2))
 #define PIXEL_SCALE               20
 
@@ -43,5 +43,6 @@ PixelState pix_ArenaGetPix(Arena* pxa, PixelCoords pos);
 void pix_ArenaSetPix(Arena* pxa, PixelCoords pos, PixelState state);
 void pix_ArenaSwitchBuff(Arena* pxa);
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos);
+size_t pix_ArenaCoordsToSqSpiral(PixelCoords pos);
 
 #endif

@@ -22,6 +22,11 @@ int gui_Init(GUI* gui, World* world) {
   gui->cam.rotation = 0.0f;
   gui->cam.zoom = 1.0f;
 
+  gui->auto_step = false;
+  gui->ms_per_gen = GUI_MAX_MS_PER_G;
+  gui->last_gen_ms = 0;
+  gui->had_target = false;
+
   gui->cell_shader = LoadShader(0, "./shader/arena.fs");
   if (gui->cell_shader.id == rlGetShaderIdDefault() || !IsShaderValid(gui->cell_shader)) {
     printf("Failed to load shader!\n");
@@ -73,20 +78,24 @@ int gui_Update(GUI* gui) {
     FloorDiv((long)target.y, PIXEL_SCALE),
   };
 
-  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !moveView) {
-    PixelState pix = wod_GetPixel(gui->world, edit);
-    printf("Pix: %i\n", pix);
-    if (pix > 0) pix = pix_Died;
-    else pix = pix_Born;
+  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !moveView) {
+    if (edit.x != gui->last_target.x || edit.y != gui->last_target.y || !gui->had_target) {
+      PixelState pix = wod_GetPixel(gui->world, edit);
+      if (pix > 0) pix = pix_Died;
+      else pix = pix_Born;
 
-    if (wod_Flip(gui->world)) return -1;
-    if (wod_SetPixel(gui->world, edit, pix)) return -1;
-    if (wod_Flip(gui->world)) return -1;
+      if (wod_Flip(gui->world)) return -1;
+      if (wod_SetPixel(gui->world, edit, pix)) return -1;
+      if (wod_Flip(gui->world)) return -1;
 
-    printf("Target: %f, %f\n", target.x, target.y);
-    printf("Edit: %li, %li\n", edit.x, edit.y);
-    printf("New: %i\n", pix);
-    printf("\n");
+      gui->last_target = (PixelCoords){
+        edit.x,
+        edit.y,
+      };
+      gui->had_target = true;
+    }
+  } else {
+    gui->had_target = false;
   }
 
   float scroll = GetMouseWheelMove();
@@ -97,6 +106,34 @@ int gui_Update(GUI* gui) {
     else if (gui->cam.zoom > GUI_MAX_ZOOM) gui->cam.zoom = GUI_MAX_ZOOM;
     gui->cam.target = target;
     gui->cam.offset = GetMousePosition();
+  }
+
+  if (IsKeyPressed(KEY_RIGHT)) {
+    gui->ms_per_gen *= 2;
+  } else if (IsKeyPressed(KEY_LEFT)) {
+    gui->ms_per_gen /= 2;
+  }
+
+  if (IsKeyPressed(KEY_SPACE)) {
+    gui->auto_step = !gui->auto_step;
+  }
+
+  GuiLabel((Rectangle){ 24, 68, 250, 24 },
+      TextFormat("Auto step %s %ums", gui->auto_step ? "enabled" : "disabled", gui->ms_per_gen));
+
+  if (gui->ms_per_gen < GUI_MIN_MS_PER_G) gui->ms_per_gen = GUI_MIN_MS_PER_G;
+  else if (gui->ms_per_gen > GUI_MAX_MS_PER_G) gui->ms_per_gen = GUI_MAX_MS_PER_G;
+
+  if (gui->auto_step && !gui->had_target) {
+    size_t millis = GetTime() * 1000;
+    if (gui->last_gen_ms + gui->ms_per_gen * 2 < millis) {
+      GuiLabel((Rectangle){ 24, 88, 250, 24 },
+      TextFormat("Lagging behind! %ums", millis - gui->last_gen_ms));
+    }
+    if (gui->last_gen_ms + gui->ms_per_gen < millis) {
+      gui->last_gen_ms = millis;
+      if (wod_StepWorld(gui->world)) return -1;
+    }
   }
 
   if (IsKeyPressed(KEY_Q)) {
