@@ -1,14 +1,16 @@
 #include "gui.h"
+#include "color_scheme.h"
 #include "debug.h"
 #include "result.h"
 #include "pixel.h"
+#include "utils.h"
 #include "world.h"
 #include <raylib.h>
 #include <rlgl.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-
+#include <raygui.h>
 
 int gui_Init(GUI* gui, World* world) {
   ASSERT(gui);
@@ -34,13 +36,13 @@ int gui_Init(GUI* gui, World* world) {
   int32_t states[3] = {
     pix_Born,
     pix_Alive,
-    pix_Died,
+    (uint8_t)pix_Died,
   };
 
   Vector4 colors[3] = {
-    { 0.22f, 0.8f, 1.0f, 1.0f },    // Born
-    { 0.22f, 0.05f, 1.0f, 1.0f },   // Alive
-    { 0.27f, 0.27f, 0.3f, 1.0f },   // Died
+    ColorNormalize(color_born),
+    ColorNormalize(color_alive),
+    ColorNormalize(color_died),
   };
   
   SetShaderValueV(gui->cell_shader, loc_states, states, SHADER_UNIFORM_INT, 3);
@@ -65,16 +67,13 @@ int gui_Update(GUI* gui) {
     gui->cam.target.y -= delta.y / gui->cam.zoom;
   }
 
+  Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
+  PixelCoords edit = {
+    FloorDiv((long)target.x, PIXEL_SCALE),
+    FloorDiv((long)target.y, PIXEL_SCALE),
+  };
+
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !moveView) {
-    Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
-    PixelCoords edit = {
-      (long)target.x / PIXEL_SCALE,
-      (long)target.y / PIXEL_SCALE,
-    };
-
-    if (edit.x < 0) edit.x -= 1;
-    if (edit.y < 0) edit.y -= 1;
-
     PixelState pix = wod_GetPixel(gui->world, edit);
     printf("Pix: %i\n", pix);
     if (pix > 0) pix = pix_Died;
@@ -87,25 +86,6 @@ int gui_Update(GUI* gui) {
     printf("Target: %f, %f\n", target.x, target.y);
     printf("Edit: %li, %li\n", edit.x, edit.y);
     printf("New: %i\n", pix);
-    printf("\n");
-  }
-
-  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && !moveView) {
-    Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
-    PixelCoords edit = {
-      (long)target.x / PIXEL_SCALE,
-      (long)target.y / PIXEL_SCALE,
-    };
-
-    if (edit.x < 0) edit.x -= 1;
-    if (edit.y < 0) edit.y -= 1;
-
-    printf("Target: %f, %f\n", target.x, target.y);
-    printf("Edit: %li, %li\n", edit.x, edit.y);
-    if (wod_Flip(gui->world)) return -1;
-    PixelState pix = wod_GetPixel(gui->world, edit);
-    if (wod_Flip(gui->world)) return -1;
-    printf("Pix: %i\n", pix);
     printf("\n");
   }
 
@@ -136,7 +116,26 @@ int gui_Draw(GUI* gui, World* world) {
   if (wod_Draw(world)) return _res;
   EndShaderMode();
 
+  Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
+  PixelCoords edit = {
+    FloorDiv((long)target.x, PIXEL_SCALE),
+    FloorDiv((long)target.y, PIXEL_SCALE),
+  };
+
+  DrawRectangle(edit.x * PIXEL_SCALE, edit.y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE, color_highlight);
+
   EndMode2D();
+
+  /*
+  static bool showMessage = false;
+  if (GuiButton((Rectangle){ 24, 24, 140, 30 }, "Click Me")) {
+    showMessage = !showMessage;
+  }
+
+  if (showMessage) {
+    GuiLabel((Rectangle){ 24, 68, 250, 24 }, "Button was clicked!");
+  }
+  */
 
   RES_RETURN(r_ENONE, 0);
 }

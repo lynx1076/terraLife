@@ -26,8 +26,6 @@ int wod_Init(World* world) {
   world->n_surv[3] = true;
   world->n_birth[3] = true;
 
-  world->iteration = 0;
-
   RES_RETURN(r_ENONE, 0);
 }
 
@@ -49,7 +47,6 @@ void wod_Print(World* world) {
   }
 
   printf("World:\n");
-  printf("Iteration: %zu\n", world->iteration);
   printf("Arenas: %zu\n", world->arenas.count);
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);

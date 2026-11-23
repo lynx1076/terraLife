@@ -9,7 +9,6 @@
 
 typedef struct {
   Vec arenas;
-  size_t iteration;
 
   bool n_surv[9];
   bool n_birth[9];

@@ -1,7 +1,6 @@
 #include "utils.h"
 #include "debug.h"
 #include "result.h"
-#include <ctype.h>
 #include <raylib.h>
 #include <errno.h>
 #include <stddef.h>
@@ -10,22 +9,6 @@
 #include <stdlib.h>
 #include <limits.h>
 
-
-int strncicmp(const char* str1, const char* str2, size_t length) {
-  ASSERT(str1);
-  ASSERT(str2);
-
-  while (tolower(*str1) == tolower(*str2) && length) {
-    length--;
-
-    str1++;
-    str2++;
-  }
-
-  if (!length) return 0;
-  if (*str1 > *str2) return 1;
-  return -1;
-}
 
 int ParseLong(long* value, char* str, size_t length) {
   ASSERT(str);
@@ -80,5 +63,14 @@ int ParseFloat(float* value, const char* str, size_t length) {
 
   *value = val;
   RES_RETURN(r_ENONE, 0);
+}
+
+long FloorDiv(long a, long b) {
+  int q = a / b;
+  int r = a % b;
+  if (r != 0 && ((a < 0) != (b < 0))) {
+    q--;
+  }
+  return q;
 }
 

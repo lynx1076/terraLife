@@ -1,3 +1,4 @@
+#include "color_scheme.h"
 #include "gui.h"
 #include "pixel.h"
 #include "result.h"
@@ -32,6 +33,11 @@ int main(int argc, const char** argv) {
   if (wod_SetPixel(&world, (PixelCoords){2, 2}, pix_Born)) return _res;
   if (wod_SetPixel(&world, (PixelCoords){2, 1}, pix_Born)) return _res;
 
+  if (wod_SetPixel(&world, (PixelCoords){1, 4}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){2, 4}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){1, 5}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){2, 5}, pix_Born)) return _res;
+
   if (wod_Flip(&world)) return -1;
 
   GUI gui;
@@ -41,7 +47,7 @@ int main(int argc, const char** argv) {
     if (gui_Update(&gui)) return -1;
 
     BeginDrawing();
-    ClearBackground((Color){20, 23, 31, 0xFF});
+    ClearBackground(color_bg);
 
     if (IsKeyPressed(KEY_SPACE)) {
       wod_StepWorld(&world);
