@@ -6,15 +6,15 @@ Made for hackClub terra 26/27
 
 Please make sure you have raylib installed on your machine
 
+Click to flip a pixel
 Hit space to step one generation
-Drag view with middle mouse button
+Drag view with middle mouse button or shift + left click
 Scroll to zoom  
 Press Q to reset view  
 
 ### What it do?
 
 terraLife uses a self-scaling chunk system to allow for more expansive simulations  
-Because that took quite sometime, user interactions are purely visual for this ship
 
 ### How it do dat?
 
@@ -23,7 +23,6 @@ This texture in turn is fed directly from the memory buffer used by the simulati
 
 ### Spying on the futur
 
-Placing pixels
 Stepping faster
 Custom rule-set
 Switching to a compute-shader

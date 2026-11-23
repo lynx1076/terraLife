@@ -72,6 +72,9 @@ void pix_ArenaSetPix(Arena* pxa, PixelCoords pos, PixelState state) {
   pos.x = pos.x % PIXEL_ARENA_SIZE;
   pos.y = pos.y % PIXEL_ARENA_SIZE;
 
+  if (pos.x < 0) pos.x = PIXEL_ARENA_SIZE + pos.x;
+  if (pos.y < 0) pos.y = PIXEL_ARENA_SIZE + pos.y;
+
   if (pxa->data->write_buff_a) pxa->data->pixels_a[pos.y][pos.x] = state;
   else pxa->data->pixels_b[pos.y][pos.x] = state;
 }
@@ -81,6 +84,9 @@ PixelState pix_ArenaGetPix(Arena* pxa, PixelCoords pos) {
 
   pos.x = pos.x % PIXEL_ARENA_SIZE;
   pos.y = pos.y % PIXEL_ARENA_SIZE;
+
+  if (pos.x < 0) pos.x = PIXEL_ARENA_SIZE + pos.x;
+  if (pos.y < 0) pos.y = PIXEL_ARENA_SIZE + pos.y;
 
   if (!pxa->data->write_buff_a) return pxa->data->pixels_a[pos.y][pos.x];
   else return pxa->data->pixels_b[pos.y][pos.x];

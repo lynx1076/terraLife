@@ -35,7 +35,7 @@ int main(int argc, const char** argv) {
   if (wod_Flip(&world)) return -1;
 
   GUI gui;
-  if (gui_Init(&gui)) return _res;
+  if (gui_Init(&gui, &world)) return _res;
 
   while (!WindowShouldClose()) {
     if (gui_Update(&gui)) return -1;

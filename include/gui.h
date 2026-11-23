@@ -5,16 +5,17 @@
 #include <raylib.h>
 
 
-#define GUI_MIN_ZOOM            0.01f
+#define GUI_MIN_ZOOM            0.08f
 #define GUI_MAX_ZOOM            2
 
 typedef struct {
   Vector2 mouseClickStart;
   Camera2D cam;
   Shader cell_shader;
+  World* world;
 } GUI;
 
-int gui_Init(GUI* gui);
+int gui_Init(GUI* gui, World* world);
 void gui_Free(GUI* gui);
 int gui_Update(GUI* gui);
 int gui_Draw(GUI* gui, World* world);

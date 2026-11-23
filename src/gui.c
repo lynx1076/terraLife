@@ -10,8 +10,9 @@
 #include <stdio.h>
 
 
-int gui_Init(GUI* gui) {
+int gui_Init(GUI* gui, World* world) {
   ASSERT(gui);
+  ASSERT(world);
   
   gui->cam = (Camera2D){ 0 };
   gui->cam.target = (Vector2){0, 0};
@@ -24,6 +25,8 @@ int gui_Init(GUI* gui) {
     printf("Failed to load shader!\n");
     RES_RETURN(r_ESHADER, -1);
   }
+
+  gui->world = world;
 
   int loc_states = GetShaderLocation(gui->cell_shader, "states");
   int loc_colors = GetShaderLocation(gui->cell_shader, "colors");
@@ -60,6 +63,50 @@ int gui_Update(GUI* gui) {
     Vector2 delta = GetMouseDelta();
     gui->cam.target.x -= delta.x / gui->cam.zoom;
     gui->cam.target.y -= delta.y / gui->cam.zoom;
+  }
+
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !moveView) {
+    Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
+    PixelCoords edit = {
+      (long)target.x / PIXEL_SCALE,
+      (long)target.y / PIXEL_SCALE,
+    };
+
+    if (edit.x < 0) edit.x -= 1;
+    if (edit.y < 0) edit.y -= 1;
+
+    PixelState pix = wod_GetPixel(gui->world, edit);
+    printf("Pix: %i\n", pix);
+    if (pix > 0) pix = pix_Died;
+    else pix = pix_Born;
+
+    if (wod_Flip(gui->world)) return -1;
+    if (wod_SetPixel(gui->world, edit, pix)) return -1;
+    if (wod_Flip(gui->world)) return -1;
+
+    printf("Target: %f, %f\n", target.x, target.y);
+    printf("Edit: %li, %li\n", edit.x, edit.y);
+    printf("New: %i\n", pix);
+    printf("\n");
+  }
+
+  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && !moveView) {
+    Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
+    PixelCoords edit = {
+      (long)target.x / PIXEL_SCALE,
+      (long)target.y / PIXEL_SCALE,
+    };
+
+    if (edit.x < 0) edit.x -= 1;
+    if (edit.y < 0) edit.y -= 1;
+
+    printf("Target: %f, %f\n", target.x, target.y);
+    printf("Edit: %li, %li\n", edit.x, edit.y);
+    if (wod_Flip(gui->world)) return -1;
+    PixelState pix = wod_GetPixel(gui->world, edit);
+    if (wod_Flip(gui->world)) return -1;
+    printf("Pix: %i\n", pix);
+    printf("\n");
   }
 
   float scroll = GetMouseWheelMove();
