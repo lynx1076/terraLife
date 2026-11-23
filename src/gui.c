@@ -114,15 +114,15 @@ int gui_Update(GUI* gui) {
     gui->ms_per_gen /= 2;
   }
 
-  if (IsKeyPressed(KEY_SPACE)) {
-    gui->auto_step = !gui->auto_step;
-  }
+  if (gui->ms_per_gen < GUI_MIN_MS_PER_G) gui->ms_per_gen = GUI_MIN_MS_PER_G;
+  else if (gui->ms_per_gen > GUI_MAX_MS_PER_G) gui->ms_per_gen = GUI_MAX_MS_PER_G;
 
   GuiLabel((Rectangle){ 24, 68, 250, 24 },
       TextFormat("Auto step %s %ums", gui->auto_step ? "enabled" : "disabled", gui->ms_per_gen));
 
-  if (gui->ms_per_gen < GUI_MIN_MS_PER_G) gui->ms_per_gen = GUI_MIN_MS_PER_G;
-  else if (gui->ms_per_gen > GUI_MAX_MS_PER_G) gui->ms_per_gen = GUI_MAX_MS_PER_G;
+  if (IsKeyPressed(KEY_SPACE)) {
+    gui->auto_step = !gui->auto_step;
+  }
 
   if (gui->auto_step && !gui->had_target) {
     size_t millis = GetTime() * 1000;
@@ -158,8 +158,10 @@ int gui_Draw(GUI* gui, World* world) {
     FloorDiv((long)target.x, PIXEL_SCALE),
     FloorDiv((long)target.y, PIXEL_SCALE),
   };
+  PixelCoords arena = pix_GlobalToArenaCoords(edit);
 
   DrawRectangle(edit.x * PIXEL_SCALE, edit.y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE, color_highlight);
+  DrawRectangle(arena.x * PIXEL_SCALE, arena.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
 
   EndMode2D();
 

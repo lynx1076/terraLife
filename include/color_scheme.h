@@ -6,6 +6,7 @@
 
 extern Color color_bg;
 extern Color color_highlight;
+extern Color color_highlight2;
 
 extern Color color_born;
 extern Color color_alive;

@@ -1,4 +1,5 @@
 #include "world.h"
+#include "color_scheme.h"
 #include "debug.h"
 #include "pixel.h"
 #include "result.h"
@@ -137,6 +138,7 @@ int wod_Draw(World* world) {
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
     if (pix_ArenaDraw(arena)) return -1;
+    DrawRectangle(arena->pos.x * PIXEL_SCALE, arena->pos.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
   }
 
   RES_RETURN(r_ENONE, 0);
