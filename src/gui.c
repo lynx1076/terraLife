@@ -55,7 +55,8 @@ void gui_Free(GUI *gui) {
 int gui_Update(GUI* gui) {
   ASSERT(gui);
 
-  if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
+  bool moveView = IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) || (IsKeyDown(KEY_LEFT_SHIFT) && IsMouseButtonDown(MOUSE_BUTTON_LEFT));
+  if (moveView) {
     Vector2 delta = GetMouseDelta();
     gui->cam.target.x -= delta.x / gui->cam.zoom;
     gui->cam.target.y -= delta.y / gui->cam.zoom;
@@ -63,9 +64,12 @@ int gui_Update(GUI* gui) {
 
   float scroll = GetMouseWheelMove();
   if (scroll) {
+    Vector2 target = GetScreenToWorld2D(GetMousePosition(), gui->cam);
     gui->cam.zoom += scroll * 0.1;
     if (gui->cam.zoom < GUI_MIN_ZOOM) gui->cam.zoom = GUI_MIN_ZOOM;
     else if (gui->cam.zoom > GUI_MAX_ZOOM) gui->cam.zoom = GUI_MAX_ZOOM;
+    gui->cam.target = target;
+    gui->cam.offset = GetMousePosition();
   }
 
   if (IsKeyPressed(KEY_Q)) {
