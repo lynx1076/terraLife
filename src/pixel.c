@@ -1,4 +1,5 @@
 #include "pixel.h"
+#include "utils.h"
 #include "result.h"
 #include "debug.h"
 #include <raylib.h>
@@ -101,13 +102,16 @@ void pix_ArenaSwitchBuff(Arena* pxa) {
 
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {
   return (PixelCoords){
-    (pos.x >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
-    (pos.y >> PIXEL_ARENA_SIZE_POW2) << PIXEL_ARENA_SIZE_POW2,
+    FloorDiv(pos.x, PIXEL_ARENA_SIZE) * PIXEL_ARENA_SIZE,
+    FloorDiv(pos.y, PIXEL_ARENA_SIZE) * PIXEL_ARENA_SIZE,
   };
 }
 
 size_t pix_ArenaCoordsToSqSpiral(PixelCoords pos) {
-  pos = pix_GlobalToArenaCoords(pos);
+  pos = (PixelCoords){
+    FloorDiv(pos.x, PIXEL_ARENA_SIZE),
+    FloorDiv(pos.y, PIXEL_ARENA_SIZE),
+  };
 
   ssize_t x = pos.x;
   if (x >= 0) x = 2 * x;
