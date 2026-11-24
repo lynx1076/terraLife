@@ -2,7 +2,7 @@
 #include "color_scheme.h"
 #include "debug.h"
 #include "result.h"
-#include "pixel.h"
+#include "arena.h"
 #include "utils.h"
 #include "world.h"
 #include <raylib.h>
@@ -22,10 +22,10 @@ int gui_Init(GUI* gui, World* world) {
   gui->cam.rotation = 0.0f;
   gui->cam.zoom = 1.0f;
 
+  gui->hold_brush = false;
   gui->auto_step = false;
   gui->ms_per_gen = GUI_MAX_MS_PER_G;
   gui->last_gen_ms = 0;
-  gui->had_target = false;
 
   gui->cell_shader = LoadShader(0, "./shader/arena.fs");
   if (gui->cell_shader.id == rlGetShaderIdDefault() || !IsShaderValid(gui->cell_shader)) {
@@ -39,8 +39,8 @@ int gui_Init(GUI* gui, World* world) {
   int loc_colors = GetShaderLocation(gui->cell_shader, "colors");
 
   int32_t states[3] = {
-    pix_Born,
-    pix_Alive,
+    (uint8_t)pix_Born,
+    (uint8_t)pix_Alive,
     (uint8_t)pix_Died,
   };
 
@@ -79,23 +79,19 @@ int gui_Update(GUI* gui) {
   };
 
   if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !moveView) {
-    if (edit.x != gui->last_target.x || edit.y != gui->last_target.y || !gui->had_target) {
-      PixelState pix = wod_GetPixel(gui->world, edit);
-      if (pix > 0) pix = pix_Died;
-      else pix = pix_Born;
-
-      if (wod_Flip(gui->world)) return -1;
-      if (wod_SetPixel(gui->world, edit, pix)) return -1;
-      if (wod_Flip(gui->world)) return -1;
-
-      gui->last_target = (PixelCoords){
-        edit.x,
-        edit.y,
-      };
-      gui->had_target = true;
+    if (!gui->hold_brush) {
+      gui->prev_brush = wod_GetPixel(gui->world, edit);
+      if (gui->prev_brush > 0) gui->prev_brush = pix_Died;
+      else gui->prev_brush = pix_Born;
     }
+
+    if (wod_Flip(gui->world)) return -1;
+    if (wod_SetPixel(gui->world, edit, gui->prev_brush)) return -1;
+    if (wod_Flip(gui->world)) return -1;
+
+    gui->hold_brush = true;
   } else {
-    gui->had_target = false;
+    gui->hold_brush = false;
   }
 
   float scroll = GetMouseWheelMove();
@@ -109,9 +105,9 @@ int gui_Update(GUI* gui) {
   }
 
   if (IsKeyPressed(KEY_RIGHT)) {
-    gui->ms_per_gen *= 2;
+    gui->ms_per_gen *= 10;
   } else if (IsKeyPressed(KEY_LEFT)) {
-    gui->ms_per_gen /= 2;
+    gui->ms_per_gen /= 10;
   }
 
   if (gui->ms_per_gen < GUI_MIN_MS_PER_G) gui->ms_per_gen = GUI_MIN_MS_PER_G;
@@ -124,7 +120,7 @@ int gui_Update(GUI* gui) {
     gui->auto_step = !gui->auto_step;
   }
 
-  if (gui->auto_step && !gui->had_target) {
+  if (gui->auto_step && !gui->hold_brush) {
     size_t millis = GetTime() * 1000;
     if (gui->last_gen_ms + gui->ms_per_gen * 2 < millis) {
       GuiLabel((Rectangle){ 24, 88, 250, 24 },
@@ -162,6 +158,8 @@ int gui_Draw(GUI* gui, World* world) {
 
   DrawRectangle(edit.x * PIXEL_SCALE, edit.y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE, color_highlight);
   DrawRectangle(arena.x * PIXEL_SCALE, arena.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
+
+  if (wod_DrawDebug(gui->world)) return -1;
 
   EndMode2D();
 

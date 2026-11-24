@@ -2,7 +2,7 @@
 #define WORLD_H
 
 #include "vector.h"
-#include "pixel.h"
+#include "arena.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -23,6 +23,7 @@ Arena* wod_GetArena(World* world, PixelCoords pos);
 PixelState wod_GetPixel(World* world, PixelCoords pos);
 int wod_SetPixel(World* world, PixelCoords pos, PixelState state);
 int wod_Draw(World* world);
+int wod_DrawDebug(World* world);
 int wod_Flip(World* world);
 int wod_CountNeighbours(World* world, PixelCoords pos, int* n);
 int wod_AllocateArenas(World* world);

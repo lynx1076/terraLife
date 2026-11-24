@@ -10,8 +10,8 @@
 #define PIXEL_SCALE               20
 
 typedef enum {
-  pix_Dead=-2,
   pix_Died=-1,
+  pix_Dead=0,
   pix_Alive=2,
   pix_Born=1,
 } PixelState;
@@ -26,6 +26,7 @@ typedef struct {
   int8_t pixels_b[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];
   Texture2D tex;
   bool write_buff_a;
+  bool empty;
 } ArenaData;
 
 typedef struct {
@@ -34,13 +35,14 @@ typedef struct {
 } Arena;
 
 
-int pix_ArenaInit(Arena* pxa, PixelCoords pos);
-void pix_ArenaFree(Arena* pxa);
-int pix_ArenaFill(Arena* pxa, PixelState fill);
-int pix_ArenaDraw(Arena* pxa);
-PixelState pix_ArenaGetPix(Arena* pxa, PixelCoords pos);
-void pix_ArenaSetPix(Arena* pxa, PixelCoords pos, PixelState state);
-void pix_ArenaSwitchBuff(Arena* pxa);
+int pix_ArenaInit(Arena* arena, PixelCoords pos);
+void pix_ArenaFree(Arena* arena);
+int pix_ArenaFill(Arena* arena, PixelState fill);
+int pix_ArenaDraw(Arena* arena);
+int pix_ArenaDrawDebug(Arena* arena);
+PixelState pix_ArenaGetPix(Arena* arena, PixelCoords pos);
+void pix_ArenaSetPix(Arena* arena, PixelCoords pos, PixelState state);
+void pix_ArenaSwitchBuff(Arena* arena);
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos);
 size_t pix_ArenaCoordsToSqSpiral(PixelCoords pos);
 

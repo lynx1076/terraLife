@@ -1,7 +1,6 @@
 #include "world.h"
-#include "color_scheme.h"
 #include "debug.h"
-#include "pixel.h"
+#include "arena.h"
 #include "result.h"
 #include "vector.h"
 #include <stdbool.h>
@@ -113,21 +112,21 @@ Arena* wod_GetArena(World* world, PixelCoords pos) {
 PixelState wod_GetPixel(World* world, PixelCoords pos) {
   ASSERT(world);
 
-  Arena* pxa = wod_GetArena(world, pos);
-  if (!pxa) return pix_Dead;
+  Arena* arena = wod_GetArena(world, pos);
+  if (!arena) return pix_Dead;
 
-  return pix_ArenaGetPix(pxa, pos);
+  return pix_ArenaGetPix(arena, pos);
 }
 
 int wod_SetPixel(World* world, PixelCoords pos, PixelState state) {
   ASSERT(world);
 
-  Arena* pxa = wod_GetArena(world, pos);
-  if (!pxa) {
+  Arena* arena = wod_GetArena(world, pos);
+  if (!arena) {
     if (wod_AddArena(world, pos)) return -1;
-    pxa = wod_GetArena(world, pos);
+    arena = wod_GetArena(world, pos);
   }
-  pix_ArenaSetPix(pxa, pos, state);
+  pix_ArenaSetPix(arena, pos, state);
 
   RES_RETURN(r_ENONE, 0);
 }
@@ -138,7 +137,21 @@ int wod_Draw(World* world) {
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
     if (pix_ArenaDraw(arena)) return -1;
-    DrawRectangle(arena->pos.x * PIXEL_SCALE, arena->pos.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
+  }
+
+  RES_RETURN(r_ENONE, 0);
+}
+
+int wod_DrawDebug(World* world) {
+  ASSERT(world);
+
+#ifndef DEBUG
+  RES_RETURN(r_ENONE, 0);
+#endif
+
+  for (size_t i = 0; i < world->arenas.count; i++) {
+    Arena* arena = vec_get(&world->arenas, i);
+    if (pix_ArenaDrawDebug(arena)) return -1;
   }
 
   RES_RETURN(r_ENONE, 0);
@@ -240,6 +253,7 @@ int wod_StepArena(World* world, Arena* arena) {
   ASSERT(world);
   ASSERT(arena);
 
+  bool saw_set_pix = false;
   for (size_t y = 0; y < PIXEL_ARENA_SIZE; y++) {
     for (size_t x = 0; x < PIXEL_ARENA_SIZE; x++) {
       PixelCoords pos = {
@@ -251,6 +265,12 @@ int wod_StepArena(World* world, Arena* arena) {
         x, 
         y, 
       };
+
+      if (arena->data->empty) {
+        if ((x != 0 && x != PIXEL_ARENA_SIZE - 1) && y != 0 && y != PIXEL_ARENA_SIZE - 1) {
+          continue;
+        }
+      }
 
       PixelState pix = pix_ArenaGetPix(arena, arena_pos);
 
@@ -265,9 +285,13 @@ int wod_StepArena(World* world, Arena* arena) {
       if (new_state < 0 && pix < 0) new_state = pix_Dead;
       else if (new_state > 0 && pix > 0) new_state = pix_Alive;
 
+      if (new_state != pix_Dead) saw_set_pix = true;
+
       pix_ArenaSetPix(arena, arena_pos, new_state);
     }
   }
+
+  arena->data->empty = !saw_set_pix;
 
   RES_RETURN(r_ENONE, 0);
 }
