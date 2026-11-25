@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#define PIXEL_ARENA_SIZE          64
+#define PIXEL_ARENA_SIZE          256
 #define PIXEL_SCALE               20
 
 typedef enum {

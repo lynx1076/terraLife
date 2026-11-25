@@ -27,16 +27,17 @@ int main(int argc, const char** argv) {
   World world;
   if (wod_Init(&world)) return _res;
 
-  if (wod_SetPixel(&world, (PixelCoords){0, 2}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){1, 2}, pix_Born)) return _res;
   if (wod_SetPixel(&world, (PixelCoords){1, 0}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){2, 2}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){2, 1}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){3, 0}, pix_Born)) return _res;
 
-  if (wod_SetPixel(&world, (PixelCoords){1, 4}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){2, 4}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){1, 5}, pix_Born)) return _res;
-  if (wod_SetPixel(&world, (PixelCoords){2, 5}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){0, 1}, pix_Born)) return _res;
+
+  if (wod_SetPixel(&world, (PixelCoords){1, 2}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){4, 2}, pix_Born)) return _res;
+
+  if (wod_SetPixel(&world, (PixelCoords){3, 3}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){4, 3}, pix_Born)) return _res;
+  if (wod_SetPixel(&world, (PixelCoords){5, 3}, pix_Born)) return _res;
 
   if (wod_Flip(&world)) return -1;
 

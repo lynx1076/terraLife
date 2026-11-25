@@ -1,0 +1,18 @@
+cp -r shader .build
+./.build/terraLife
+
+=================================================================
+==12227==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 128 byte(s) in 1 object(s) allocated from:
+    #0 0x7f8430d2bea9 in calloc (/usr/lib/libasan.so.8+0x12bea9) (BuildId: b8a4241051a1621937fdc46e867ba7ecb56d96ea)
+    #1 0x7f84308518ce in LoadShaderFromMemory (/usr/lib/libraylib.so.620+0x518ce) (BuildId: 4fb5d567f5e6c0cd8619ac43a2598753d698722f)
+    #2 0x7f8430851ada in LoadShader (/usr/lib/libraylib.so.620+0x51ada) (BuildId: 4fb5d567f5e6c0cd8619ac43a2598753d698722f)
+    #3 0x556a1723e2ae in gui_Init src/graphics.c:30
+    #4 0x556a1723eebb in main src/main.c:45
+    #5 0x7f842fc27780  (/usr/lib/libc.so.6+0x27780) (BuildId: 6961407ef2e7877eabf5ed8c5a39aea9de7194c1)
+    #6 0x7f842fc278b8 in __libc_start_main (/usr/lib/libc.so.6+0x278b8) (BuildId: 6961407ef2e7877eabf5ed8c5a39aea9de7194c1)
+    #7 0x556a1723d4e4 in _start (/home/lynx/terraLife/.build/terraLife+0x24e4) (BuildId: 24304ba1a38fa5dcd3f28c9953e4daa828594be5)
+
+SUMMARY: AddressSanitizer: 128 byte(s) leaked in 1 allocation(s).
+make: *** [Makefile:27: run] Error 1
