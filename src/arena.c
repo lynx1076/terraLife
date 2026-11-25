@@ -86,6 +86,8 @@ int pix_ArenaDrawDebug(Arena* arena) {
     DrawRectangle(arena->pos.x * PIXEL_SCALE, arena->pos.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight_green);
   }
 
+  DrawText(arena->data->write_buff_a ? "A" : "B", arena->pos.x * PIXEL_SCALE, arena->pos.y * PIXEL_SCALE, 60, WHITE);
+
   RES_RETURN(r_ENONE, 0);
 }
 
@@ -123,15 +125,6 @@ void pix_ArenaSwitchBuff(Arena* arena) {
   if (arena->data->empty) return;
 
   arena->data->write_buff_a = !arena->data->write_buff_a;
-}
-
-void pix_ArenaSetBuffEmpty(Arena* arena) {
-  ASSERT(arena);
-
-  if (arena->data->empty) return;
-
-  pix_ArenaSwitchBuff(arena);
-  arena->data->empty = true;
 }
 
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {

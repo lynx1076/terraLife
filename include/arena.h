@@ -43,7 +43,6 @@ int pix_ArenaDrawDebug(Arena* arena);
 PixelState pix_ArenaGetPix(Arena* arena, PixelCoords pos);
 void pix_ArenaSetPix(Arena* arena, PixelCoords pos, PixelState state);
 void pix_ArenaSwitchBuff(Arena* arena);
-void pix_ArenaSetBuffEmpty(Arena* arena);
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos);
 size_t pix_ArenaCoordsToSqSpiral(PixelCoords pos);
 
