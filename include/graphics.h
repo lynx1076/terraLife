@@ -1,5 +1,5 @@
-#ifndef GUI_H
-#define GUI_H
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
 
 #include "arena.h"
 #include "world.h"

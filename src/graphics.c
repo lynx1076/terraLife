@@ -1,4 +1,4 @@
-#include "gui.h"
+#include "graphics.h"
 #include "color_scheme.h"
 #include "debug.h"
 #include "result.h"
@@ -113,9 +113,6 @@ int gui_Update(GUI* gui) {
   if (gui->ms_per_gen < GUI_MIN_MS_PER_G) gui->ms_per_gen = GUI_MIN_MS_PER_G;
   else if (gui->ms_per_gen > GUI_MAX_MS_PER_G) gui->ms_per_gen = GUI_MAX_MS_PER_G;
 
-  GuiLabel((Rectangle){ 24, 68, 250, 24 },
-      TextFormat("Auto step %s %ums", gui->auto_step ? "enabled" : "disabled", gui->ms_per_gen));
-
   if (IsKeyPressed(KEY_SPACE)) {
     gui->auto_step = !gui->auto_step;
   }
@@ -123,8 +120,6 @@ int gui_Update(GUI* gui) {
   if (gui->auto_step && !gui->hold_brush) {
     size_t millis = GetTime() * 1000;
     if (gui->last_gen_ms + gui->ms_per_gen * 2 < millis) {
-      GuiLabel((Rectangle){ 24, 88, 250, 24 },
-      TextFormat("Lagging behind! %ums", millis - gui->last_gen_ms));
     }
     if (gui->last_gen_ms + gui->ms_per_gen < millis) {
       gui->last_gen_ms = millis;
@@ -162,17 +157,6 @@ int gui_Draw(GUI* gui, World* world) {
   if (wod_DrawDebug(gui->world)) return -1;
 
   EndMode2D();
-
-  /*
-  static bool showMessage = false;
-  if (GuiButton((Rectangle){ 24, 24, 140, 30 }, "Click Me")) {
-    showMessage = !showMessage;
-  }
-
-  if (showMessage) {
-    GuiLabel((Rectangle){ 24, 68, 250, 24 }, "Button was clicked!");
-  }
-  */
 
   RES_RETURN(r_ENONE, 0);
 }

@@ -1,5 +1,5 @@
 #include "color_scheme.h"
-#include "gui.h"
+#include "graphics.h"
 #include "arena.h"
 #include "result.h"
 #include "world.h"

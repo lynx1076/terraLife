@@ -291,7 +291,7 @@ int wod_StepArena(World* world, Arena* arena) {
     }
   }
 
-  arena->data->empty = !saw_set_pix;
+  if (!saw_set_pix) pix_ArenaSetBuffEmpty(arena);
 
   RES_RETURN(r_ENONE, 0);
 }

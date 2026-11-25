@@ -120,7 +120,18 @@ PixelState pix_ArenaGetPix(Arena* arena, PixelCoords pos) {
 void pix_ArenaSwitchBuff(Arena* arena) {
   ASSERT(arena);
 
+  if (arena->data->empty) return;
+
   arena->data->write_buff_a = !arena->data->write_buff_a;
+}
+
+void pix_ArenaSetBuffEmpty(Arena* arena) {
+  ASSERT(arena);
+
+  if (arena->data->empty) return;
+
+  pix_ArenaSwitchBuff(arena);
+  arena->data->empty = true;
 }
 
 PixelCoords pix_GlobalToArenaCoords(PixelCoords pos) {
