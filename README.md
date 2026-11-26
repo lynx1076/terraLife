@@ -9,6 +9,7 @@ Please make sure you have raylib installed on your machine
 Click to flip a pixel
 Hit space to step one generation
 Drag view with middle mouse button or shift + left click
+Alternatively move the view with WASD
 Scroll to zoom  
 Press Q to reset view  
 Press N to step one generation
