@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "gui.h"
 #include "color_scheme.h"
 #include "debug.h"
 #include "result.h"
@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <raygui.h>
+#include <raymath.h>
 
 int gui_Init(GUI* gui, World* world) {
   ASSERT(gui);
@@ -22,6 +22,7 @@ int gui_Init(GUI* gui, World* world) {
   gui->cam.rotation = 0.0f;
   gui->cam.zoom = 1.0f;
 
+  gui->moved_view = false;
   gui->hold_brush = false;
   gui->auto_step = false;
   gui->ms_per_gen = GUI_MAX_MS_PER_G;
@@ -64,9 +65,12 @@ void gui_Free(GUI *gui) {
 
 int gui_Update(GUI* gui) {
   ASSERT(gui);
+  size_t millis = GetTime() * 1000;
 
-  bool moveView = IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) || (IsKeyDown(KEY_LEFT_SHIFT) && IsMouseButtonDown(MOUSE_BUTTON_LEFT));
-  if (moveView) {
+  bool move_view = IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) ||
+                  ((IsKeyDown(KEY_LEFT_SHIFT) || gui->moved_view) && IsMouseButtonDown(MOUSE_BUTTON_LEFT));
+  gui->moved_view = move_view;
+  if (move_view) {
     Vector2 delta = GetMouseDelta();
     gui->cam.target.x -= delta.x / gui->cam.zoom;
     gui->cam.target.y -= delta.y / gui->cam.zoom;
@@ -78,7 +82,7 @@ int gui_Update(GUI* gui) {
     FloorDiv((long)target.y, PIXEL_SCALE),
   };
 
-  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !moveView) {
+  if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !move_view) {
     if (!gui->hold_brush) {
       gui->prev_brush = wod_GetPixel(gui->world, edit);
       if (gui->prev_brush > 0) gui->prev_brush = pix_Died;
@@ -115,10 +119,16 @@ int gui_Update(GUI* gui) {
 
   if (IsKeyPressed(KEY_SPACE)) {
     gui->auto_step = !gui->auto_step;
+    gui->last_gen_ms = millis;
+  }
+
+  if (IsKeyPressed(KEY_N)) {
+    gui->auto_step = false;
+    gui->last_gen_ms = millis;
+    if (wod_StepWorld(gui->world)) return -1;
   }
 
   if (gui->auto_step && !gui->hold_brush) {
-    size_t millis = GetTime() * 1000;
     if (gui->last_gen_ms + gui->ms_per_gen * 2 < millis) {
     }
     if (gui->last_gen_ms + gui->ms_per_gen < millis) {
@@ -130,6 +140,27 @@ int gui_Update(GUI* gui) {
   if (IsKeyPressed(KEY_Q)) {
     gui->cam.target = (Vector2){0, 0};
     gui->cam.zoom = 1.0f;
+  }
+
+  Vector2 move = { 0, 0 };
+  if (IsKeyDown(KEY_W)) {
+    move.y -= 1;
+  } else if (IsKeyDown(KEY_S)) {
+    move.y += 1;
+  }
+
+  if (IsKeyDown(KEY_A)) {
+    move.x -= 1;
+  } else if (IsKeyDown(KEY_D)) {
+    move.x += 1;
+  }
+
+  move = Vector2Normalize(move);
+  move = Vector2Scale(move, GUI_CAM_STEP_SIZE * GetFrameTime() / gui->cam.zoom);
+  gui->cam.target = Vector2Add(gui->cam.target, move);
+
+  if (IsKeyPressed(KEY_F3)) {
+    debug = !debug;
   }
 
   RES_RETURN(r_ENONE, 0);
@@ -152,9 +183,11 @@ int gui_Draw(GUI* gui, World* world) {
   PixelCoords arena = pix_GlobalToArenaCoords(edit);
 
   DrawRectangle(edit.x * PIXEL_SCALE, edit.y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE, color_highlight);
-  DrawRectangle(arena.x * PIXEL_SCALE, arena.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
 
-  if (wod_DrawDebug(gui->world)) return -1;
+  if (debug) {
+    if (wod_DrawDebug(gui->world)) return -1;
+    DrawRectangle(arena.x * PIXEL_SCALE, arena.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight2);
+  }
 
   EndMode2D();
 

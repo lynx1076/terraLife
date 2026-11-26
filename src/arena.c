@@ -76,10 +76,6 @@ int pix_ArenaDraw(Arena* arena) {
 int pix_ArenaDrawDebug(Arena* arena) {
   ASSERT(arena);
 
-#ifndef DEBUG
-  RES_RETURN(r_ENONE, 0);
-#endif
-
   if (arena->data->empty) {
     DrawRectangle(arena->pos.x * PIXEL_SCALE, arena->pos.y * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, PIXEL_ARENA_SIZE * PIXEL_SCALE, color_highlight_yellow);
   } else {

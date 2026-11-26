@@ -145,10 +145,6 @@ int wod_Draw(World* world) {
 int wod_DrawDebug(World* world) {
   ASSERT(world);
 
-#ifndef DEBUG
-  RES_RETURN(r_ENONE, 0);
-#endif
-
   for (size_t i = 0; i < world->arenas.count; i++) {
     Arena* arena = vec_get(&world->arenas, i);
     if (pix_ArenaDrawDebug(arena)) return -1;

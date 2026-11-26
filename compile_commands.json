@@ -1,21 +1,156 @@
 [
   {
-    "file": "src/main.c",
+    "file": "src/arena.c",
     "arguments": [
       "/usr/bin/gcc",
       "-Wall",
       "-Wextra",
       "-DVERSION=\"0.1\"",
       "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
       "-Iinclude",
       "-MMD",
       "-MP",
       "-c",
-      "src/main.c",
+      "src/arena.c",
       "-o",
-      ".build/main.o"
+      ".build/arena.o"
     ],
     "directory": "/home/lynx/terraLife",
-    "output": ".build/main.o"
+    "output": ".build/arena.o"
+  },
+  {
+    "file": "src/debug.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/debug.c",
+      "-o",
+      ".build/debug.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/debug.o"
+  },
+  {
+    "file": "src/gui.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/gui.c",
+      "-o",
+      ".build/gui.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/gui.o"
+  },
+  {
+    "file": "src/str.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/str.c",
+      "-o",
+      ".build/str.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/str.o"
+  },
+  {
+    "file": "src/utils.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/utils.c",
+      "-o",
+      ".build/utils.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/utils.o"
+  },
+  {
+    "file": "src/vector.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/vector.c",
+      "-o",
+      ".build/vector.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/vector.o"
+  },
+  {
+    "file": "src/world.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-DVERSION=\"0.1\"",
+      "-O3",
+      "-g",
+      "-O0",
+      "-DDEBUG",
+      "-Iinclude",
+      "-MMD",
+      "-MP",
+      "-c",
+      "src/world.c",
+      "-o",
+      ".build/world.o"
+    ],
+    "directory": "/home/lynx/terraLife",
+    "output": ".build/world.o"
   }
 ]

@@ -1,6 +1,10 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stdbool.h>
+
+
+extern bool debug;
 
 #ifdef DEBUG
 #include <stdio.h>

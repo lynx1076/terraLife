@@ -11,6 +11,9 @@ Hit space to step one generation
 Drag view with middle mouse button or shift + left click
 Scroll to zoom  
 Press Q to reset view  
+Press N to step one generation
+Use the left and right arrow to slow down or speed up time
+Use F3 to access the debug-menu
 
 ### What it do?
 

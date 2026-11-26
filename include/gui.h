@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef GUI_H
+#define GUI_H
 
 #include "arena.h"
 #include "world.h"
@@ -13,12 +13,15 @@
 #define GUI_MIN_MS_PER_G        10
 #define GUI_MAX_MS_PER_G        1000
 
+#define GUI_CAM_STEP_SIZE       400
+
 typedef struct {
   Camera2D cam;
   Shader cell_shader;
   World* world;
 
   bool auto_step;
+  bool moved_view;
   bool hold_brush;
   PixelState prev_brush;
   unsigned int ms_per_gen;
