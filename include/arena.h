@@ -1,25 +1,13 @@
-#ifndef PIXEL_H
-#define PIXEL_H
+#ifndef ARENA_H
+#define ARENA_H
 
+#include "pixel.h"
 #include <raylib.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
 
-#define PIXEL_ARENA_SIZE          64
+#define PIXEL_ARENA_SIZE          32
 #define PIXEL_SCALE               20
-
-typedef enum {
-  pix_Died=-1,
-  pix_Dead=0,
-  pix_Alive=2,
-  pix_Born=1,
-} PixelState;
-
-typedef struct {
-  ssize_t x;
-  ssize_t y;
-} PixelCoords;
 
 typedef struct {
   int8_t pixels_a[PIXEL_ARENA_SIZE][PIXEL_ARENA_SIZE];

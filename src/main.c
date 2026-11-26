@@ -1,6 +1,5 @@
 #include "color_scheme.h"
 #include "gui.h"
-#include "arena.h"
 #include "result.h"
 #include "world.h"
 #include <raylib.h>
@@ -18,6 +17,14 @@ Camera2D camera;
 int main(int argc, const char** argv) {
   (void)argc;
   (void)argv;
+
+#ifdef GRAPHICS_API_OPENGL_33
+  printf("Defined 33\n");
+#endif
+
+#ifdef GRAPHICS_API_OPENGL_43
+  printf("Defined 43\n");
+#endif
 
   SetTraceLogLevel(LOG_WARNING);
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
